@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<script>
+function imprimirAhora(){ window.print(); }
+function registrar(rec){ document.getElementById('recogio').value = rec; document.getElementById('pickupForm').submit(); }
+</script>
+{% endblock %}
+{% block content %}
+<div class="card">
+  <h2>Documentos para impresión</h2>
+  <p><strong>Mes:</strong> {{ MONTHS[item.month] }}</p>
+  <p><strong>CANT:</strong> {{ item.cant }}</p>
+  <p><strong>Número:</strong> {{ item.numero or '' }}</p>
+  <p><strong>Comité:</strong> {{ item.comite }}</p>
+  <p><strong>Leche:</strong> {{ item.leche }} | <strong>Harina:</strong> {{ item.harina }}</p>
+  <div class="noprint" style="margin:14px 0">
+    <button class="btn" onclick="imprimirAhora()">Imprimir</button>
+  </div>
+  <hr>
+  <h3>Registro de recojo</h3>
+  <p class="muted">Después de imprimir, indica si el comité recogió.</p>
+  <div class="noprint"><button class="btn" onclick="registrar('si')">Sí</button> <button class="btn secondary" onclick="registrar('no')">No</button></div>
+  <form id="pickupForm" method="post" action="{{ url_for('confirm_pickup') }}">
+    <input type="hidden" name="month" value="{{ item.month }}"><input type="hidden" name="cant" value="{{ item.cant }}"><input type="hidden" name="numero" value="{{ item.numero or '' }}"><input type="hidden" name="comite" value="{{ item.comite }}"><input type="hidden" name="leche" value="{{ item.leche }}"><input type="hidden" name="harina" value="{{ item.harina }}"><input type="hidden" id="recogio" name="recogio" value="no">
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: pvl-web
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app
+    disk:
+      name: pvl-data
+      mountPath: /opt/render/project/src/persistent
+      sizeGB: 1
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: PVL_DATA_DIR
+        value: /opt/render/project/src/persistent

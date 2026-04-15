@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<script>
+function adminPrompt(){
+  const p = prompt('Poner contraseña de administración:');
+  if(p===null) return;
+  document.getElementById('admin_password').value = p;
+  document.getElementById('admin_form').submit();
+}
+</script>
+{% endblock %}
+{% block content %}
+<div class="grid">
+  <div class="col-8">
+    <div class="card">
+      <h2>Búsqueda de comité</h2>
+      <form method="post">
+        <div class="grid">
+          <div class="col-6"><label>Buscar por CANT, número o nombre</label><input name="query" value="{{ query }}" placeholder="Ejemplo: 12 o comité central"></div>
+          <div class="col-6"><label>Meses a consultar</label>
+            <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px">
+              {% for m, name in MONTHS.items() %}
+                <label><input type="checkbox" name="months" value="{{m}}" {% if m in selected_months %}checked{% endif %} {% if not months_status[m].enabled %}disabled{% endif %}> {{ name }}</label>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="col-12"><button class="btn" type="submit">Buscar</button></div>
+        </div>
+      </form>
+    </div>
+    <div class="card">
+      <h3>Resultados</h3>
+      <table>
+        <tr><th>Mes</th><th>CANT</th><th>Número</th><th>Comité</th><th>Leche</th><th>Harina</th><th class="noprint">Acción</th></tr>
+        {% for r in results %}
+        <tr>
+          <td>{{ MONTHS[r.month] }}</td><td>{{ r.cant }}</td><td>{{ r.numero or '' }}</td><td>{{ r.comite }}</td><td>{{ r.leche }}</td><td>{{ r.harina }}</td>
+          <td class="noprint"><a class="btn" href="{{ url_for('print_committee', month=r.month, cant=r.cant|int) }}">Imprimir</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="muted">Sin resultados todavía.</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+  <div class="col-4">
+    <div class="card">
+      <h3>Estado actual</h3>
+      <p><strong>Stock leche:</strong> {{ '%.2f'|format(stock.leche) }}</p>
+      <p><strong>Stock harina:</strong> {{ '%.2f'|format(stock.harina) }}</p>
+      <p><strong>Último respaldo:</strong><br><span class="muted">{{ last_backup_at or 'Aún no disponible' }}</span></p>
+      {% if latest_backup %}<a class="btn secondary" href="{{ url_for('backup_latest') }}">Descargar último respaldo</a>{% endif %}
+    </div>
+    <div class="card noprint">
+      <h3>Accesos</h3>
+      <button class="btn warn" onclick="adminPrompt()">Administrar meses</button>
+      <a class="btn secondary" href="{{ url_for('consolidado_dia') }}">Imprimir consolidado del día</a>
+      <form id="admin_form" action="{{ url_for('admin_check') }}" method="post" style="display:none"><input id="admin_password" name="admin_password"></form>
+    </div>
+    <div class="card">
+      <h3>Meses cargados</h3>
+      <table>
+        <tr><th>Mes</th><th>Pecosa</th><th>Acta</th></tr>
+        {% for m, st in months_status.items() %}
+        <tr><td>{{ MONTHS[m] }}</td><td>{{ 'Sí' if st.has_pecosa else 'No' }}</td><td>{{ 'Sí' if st.has_acta else 'No' }}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

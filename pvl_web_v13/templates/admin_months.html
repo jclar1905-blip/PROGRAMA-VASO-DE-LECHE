@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="grid">
+  <div class="col-6">
+    <div class="card">
+      <h2>Administrar meses</h2>
+      <form method="post" enctype="multipart/form-data">
+        <input type="hidden" name="action" value="upload">
+        <div style="margin-bottom:10px"><label>Mes</label><select name="month">{% for m, name in MONTHS.items() %}<option value="{{m}}">{{ name }}</option>{% endfor %}</select></div>
+        <div style="margin-bottom:10px"><label>Tipo de archivo</label><select name="file_type"><option value="pecosa">Pecosa</option><option value="acta">Acta</option></select></div>
+        <div style="margin-bottom:10px"><label>Archivo</label><input type="file" name="file" required></div>
+        <button class="btn" type="submit">Subir archivo</button>
+      </form>
+    </div>
+    <div class="card">
+      <h3>Stock actual</h3>
+      <form method="post">
+        <input type="hidden" name="action" value="stock">
+        <div style="margin-bottom:10px"><label>Leche</label><input name="stock_leche" type="number" step="0.01" required></div>
+        <div style="margin-bottom:10px"><label>Harina</label><input name="stock_harina" type="number" step="0.01" required></div>
+        <div style="margin-bottom:10px"><label>Observación</label><input name="notes"></div>
+        <button class="btn" type="submit">Guardar stock</button>
+      </form>
+      <p><strong>Disponible:</strong> Leche {{ '%.2f'|format(stock.leche) }} | Harina {{ '%.2f'|format(stock.harina) }}</p>
+    </div>
+  </div>
+  <div class="col-6">
+    <div class="card">
+      <h3>Respaldos automáticos</h3>
+      <form method="post" action="{{ url_for('backup_create') }}" class="noprint"><button class="btn secondary" type="submit">Crear respaldo manual</button></form>
+      <p class="muted">Los respaldos se generan automáticamente cuando cambias contraseña, actualizas stock, subes meses o registras recojos.</p>
+      <table>
+        <tr><th>Archivo</th><th>Acción</th></tr>
+        {% for b in backups %}
+        <tr><td>{{ b.name }}</td><td>{% if loop.first %}<a class="btn secondary" href="{{ url_for('backup_latest') }}">Descargar último</a>{% endif %}</td></tr>
+        {% else %}
+        <tr><td colspan="2">Sin respaldos aún.</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="card">
+      <h3>Estado de archivos por mes</h3>
+      <table>
+        <tr><th>Mes</th><th>Habilitado</th><th>Pecosa</th><th>Acta</th></tr>
+        {% for m, st in status.items() %}
+        <tr><td>{{ MONTHS[m] }}</td><td>{{ 'Sí' if st.enabled else 'No' }}</td><td>{{ st.pecosa.name if st.pecosa else 'No cargado' }}</td><td>{{ st.acta.name if st.acta else 'No cargado' }}</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+    <div class="card">
+      <h3>Historial de stock</h3>
+      <table>
+        <tr><th>Fecha</th><th>Leche</th><th>Harina</th><th>Notas</th></tr>
+        {% for s in stock_history %}
+        <tr><td>{{ s['created_at'] }}</td><td>{{ s['leche'] }}</td><td>{{ s['harina'] }}</td><td>{{ s['notes'] }}</td></tr>
+        {% else %}
+        <tr><td colspan="4">Sin registros.</td></tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

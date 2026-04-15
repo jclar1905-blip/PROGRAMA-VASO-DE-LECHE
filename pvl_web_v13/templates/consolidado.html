@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card">
+  <h2>Consolidado del día</h2>
+  <p><strong>Fecha:</strong> {{ data.fecha }}</p>
+  <p><strong>Stock inicial:</strong> Leche {{ data.stock_inicial_leche }} | Harina {{ data.stock_inicial_harina }}</p>
+  <table>
+    <tr><th>Hora</th><th>Mes</th><th>CANT</th><th>Número</th><th>Comité</th><th>Leche</th><th>Harina</th><th>Stock leche</th><th>Stock harina</th></tr>
+    {% for r in data.movimientos %}
+    <tr><td>{{ r.hora }}</td><td>{{ MONTHS[r.month] }}</td><td>{{ r.cant }}</td><td>{{ r.numero or '' }}</td><td>{{ r.comite }}</td><td>{{ r.leche }}</td><td>{{ r.harina }}</td><td>{{ r.stock_leche_despues }}</td><td>{{ r.stock_harina_despues }}</td></tr>
+    {% else %}
+    <tr><td colspan="9" class="muted">Aún no hay movimientos hoy.</td></tr>
+    {% endfor %}
+  </table>
+  <p><strong>Stock final:</strong> Leche {{ data.stock_final_leche }} | Harina {{ data.stock_final_harina }}</p>
+  <div class="noprint"><button class="btn" onclick="window.print()">Imprimir consolidado</button></div>
+</div>
+{% endblock %}

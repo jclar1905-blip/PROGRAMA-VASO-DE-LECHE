@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="card" style="max-width:420px;margin:40px auto;">
+  <h2>Ingreso al sistema</h2>
+  <p class="muted">Ingrese sus credenciales para continuar.</p>
+  <form method="post">
+    <div style="margin-bottom:10px"><label>Usuario</label><input name="username" required></div>
+    <div style="margin-bottom:10px"><label>Contraseña</label><input type="password" name="password" required></div>
+    <button class="btn" type="submit">Ingresar</button>
+  </form>
+</div>
+{% endblock %}
